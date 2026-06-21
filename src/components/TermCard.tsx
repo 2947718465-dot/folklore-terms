@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Copy, Check } from 'lucide-react';
 import type { Term, ViewMode } from '@/types/term';
 import { CATEGORIES } from '@/types/term';
@@ -20,6 +21,7 @@ export function TermCard({
   onSubcategoryClick,
 }: TermCardProps) {
   const [copied, setCopied] = useState(false);
+  const navigate = useNavigate();
   const color = CATEGORIES[term.category]?.color || '#999';
 
   const handleCopy = async (e: React.MouseEvent) => {
@@ -30,14 +32,19 @@ export function TermCard({
     setTimeout(() => setCopied(false), 1500);
   };
 
+  const handleClick = () => {
+    navigate(`/term/${term.id}`);
+  };
+
   const cnHtml = query ? highlight(term.cn, query) : term.cn;
   const enHtml = query ? highlight(term.en, query) : term.en;
   const defHtml = query ? highlight(term.definition, query) : term.definition;
 
   return (
     <article
+      onClick={handleClick}
       className={cn(
-        'group relative rounded-xl border border-[var(--border)] bg-[var(--surface)] transition-all hover:shadow-lg hover:-translate-y-0.5',
+        'group relative cursor-pointer rounded-xl border border-[var(--border)] bg-[var(--surface)] transition-all hover:shadow-lg hover:-translate-y-0.5',
         view === 'compact' ? 'px-4 py-3' : 'px-5 py-4'
       )}
       style={{ borderLeftColor: color, borderLeftWidth: '3px' }}

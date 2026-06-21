@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useTerms } from '@/hooks/useTerms';
 import { useTermSearch } from '@/hooks/useTermSearch';
 import { useTermFilter } from '@/hooks/useTermFilter';
@@ -12,8 +13,9 @@ import { Breadcrumb } from '@/components/Breadcrumb';
 import { TermList } from '@/components/TermList';
 import { Footer } from '@/components/Footer';
 import { LoadingState } from '@/components/LoadingState';
+import { TermDetail } from '@/components/TermDetail';
 
-function App() {
+function Home() {
   const { terms, isLoading, error, totalCount } = useTerms();
   const { state, updateState, resetState } = useUrlState();
 
@@ -83,7 +85,7 @@ function App() {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <p className="text-lg text-[var(--red)]">加载失败</p>
+          <p className="text-lg text-red-500">加载失败</p>
           <p className="mt-2 text-sm text-[var(--muted)]">{error}</p>
           <button
             onClick={() => window.location.reload()}
@@ -158,6 +160,17 @@ function App() {
 
       <Footer />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter basename="/folklore-terms">
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/term/:id" element={<TermDetail />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
