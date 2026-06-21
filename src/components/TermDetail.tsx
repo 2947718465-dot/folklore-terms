@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Copy, Check, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Copy, Check, ExternalLink, Search, Loader2 } from 'lucide-react';
 import type { Term } from '@/types/term';
 import { CATEGORIES } from '@/types/term';
 import { cn } from '@/lib/utils';
+import { searchTermImage, type WikipediaImage } from '@/lib/wikipedia';
 
 export function TermDetail() {
   const { id } = useParams<{ id: string }>();
@@ -11,6 +12,9 @@ export function TermDetail() {
   const [term, setTerm] = useState<Term | null>(null);
   const [copied, setCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [image, setImage] = useState<WikipediaImage | null>(null);
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     async function loadTerm() {
@@ -40,6 +44,28 @@ export function TermDetail() {
 
     loadTerm();
   }, [id]);
+
+  // Search for image when term loads
+  useEffect(() => {
+    if (!term) return;
+
+    async function loadImage() {
+      setImageLoading(true);
+      setImageError(false);
+      try {
+        const result = await searchTermImage(term!.cn, term!.en);
+        if (result) {
+          setImage(result);
+        }
+      } catch {
+        setImageError(true);
+      } finally {
+        setImageLoading(false);
+      }
+    }
+
+    loadImage();
+  }, [term]);
 
   const handleCopy = async () => {
     if (!term) return;
@@ -94,20 +120,42 @@ export function TermDetail() {
 
       {/* Content */}
       <main className="mx-auto max-w-4xl px-4 py-8 md:px-6">
-        {/* Image Placeholder */}
+        {/* Image */}
         <div className="mb-8 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)]">
-          <div
-            className="flex h-64 items-center justify-center"
-            style={{ backgroundColor: `${color}10` }}
-          >
-            <div className="text-center">
-              <div className="text-6xl opacity-30">📖</div>
-              <p className="mt-2 text-sm text-[var(--muted)]">术语图片</p>
-              <p className="text-xs text-[var(--muted)] opacity-50">
-                可添加 {term.cn} 的相关图片
-              </p>
+          {imageLoading ? (
+            <div className="flex h-64 items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-[var(--accent)]" />
+              <span className="ml-2 text-sm text-[var(--muted)]">搜索图片中...</span>
             </div>
-          </div>
+          ) : image && !imageError ? (
+            <div className="relative">
+              <img
+                src={image.url}
+                alt={term.cn}
+                className="h-64 w-full object-cover"
+                onError={() => setImageError(true)}
+              />
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                <p className="text-sm text-white/80">图片来源：维基百科</p>
+              </div>
+            </div>
+          ) : (
+            <div
+              className="flex h-64 flex-col items-center justify-center"
+              style={{ backgroundColor: `${color}10` }}
+            >
+              <Search className="h-12 w-12 opacity-20" style={{ color }} />
+              <p className="mt-2 text-sm text-[var(--muted)]">暂无图片</p>
+              <a
+                href={`https://www.google.com/search?q=${encodeURIComponent(term.cn)}&tbm=isch`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 text-xs text-[var(--accent)] hover:underline"
+              >
+                在 Google 搜索图片
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Title */}
@@ -143,6 +191,16 @@ export function TermDetail() {
             {term.definition || '暂无详细释义'}
           </p>
         </div>
+
+        {/* Wikipedia Description */}
+        {image?.description && (
+          <div className="mb-8 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6">
+            <h2 className="mb-3 text-lg font-semibold text-[var(--ink)]">维基百科</h2>
+            <p className="text-sm leading-relaxed text-[var(--muted)]">
+              {image.description}
+            </p>
+          </div>
+        )}
 
         {/* Related Info */}
         <div className="mb-8 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6">
