@@ -1,4 +1,4 @@
-interface WikipediaImage {
+export interface WikipediaImage {
   url: string;
   title: string;
   description: string;
@@ -6,7 +6,8 @@ interface WikipediaImage {
 
 export async function searchTermImage(termCn: string, termEn?: string): Promise<WikipediaImage | null> {
   // Try Chinese Wikipedia first, then English
-  const queries = [termCn, termEn].filter(Boolean);
+  const queries: string[] = [termCn];
+  if (termEn) queries.push(termEn);
 
   for (const query of queries) {
     try {
@@ -45,7 +46,7 @@ async function searchWikipedia(query: string, lang: string): Promise<WikipediaIm
 
   if (data.thumbnail && data.thumbnail.source) {
     return {
-      url: data.thumbnail.source.replace(/\/\d+px-/, '/800px-'), // Get larger image
+      url: data.thumbnail.source.replace(/\/\d+px-/, '/800px-'),
       title: data.title || query,
       description: data.extract || '',
     };
@@ -57,13 +58,11 @@ async function searchWikipedia(query: string, lang: string): Promise<WikipediaIm
 export async function searchMultipleImages(terms: { cn: string; en?: string }[]): Promise<Map<string, WikipediaImage>> {
   const results = new Map<string, WikipediaImage>();
 
-  // Search in batches to avoid rate limiting
   for (const term of terms.slice(0, 20)) {
     const image = await searchTermImage(term.cn, term.en);
     if (image) {
       results.set(term.cn, image);
     }
-    // Small delay to be nice to Wikipedia API
     await new Promise(resolve => setTimeout(resolve, 100));
   }
 
