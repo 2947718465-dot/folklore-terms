@@ -184,16 +184,36 @@ export function TermDetail() {
           <span className="text-sm text-[var(--muted)]">{term.subcategory3}</span>
         </div>
 
-        {/* Definition */}
-        <div className="mb-8 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6">
+        {/* Brief Definition */}
+        <div className="mb-6 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6">
           <h2 className="mb-3 text-lg font-semibold text-[var(--ink)]">释义</h2>
           <p className="leading-relaxed text-[var(--muted)]">
-            {term.definition || '暂无详细释义'}
+            {term.definition || '暂无释义'}
           </p>
         </div>
 
+        {/* Detailed Definition */}
+        {term.detailed && (
+          <div className="mb-8 rounded-xl border border-[var(--accent)]/20 bg-[var(--surface)] p-6">
+            <h2 className="mb-4 text-lg font-semibold text-[var(--ink)]">详细释义</h2>
+            <div className="prose prose-sm max-w-none leading-relaxed text-[var(--muted)]">
+              {term.detailed.split('\n').map((line, i) => {
+                // 处理 **加粗** 标记
+                const parts = line.split(/\*\*(.*?)\*\*/g);
+                return (
+                  <p key={i} className={i > 0 ? 'mt-3' : ''}>
+                    {parts.map((part, j) => 
+                      j % 2 === 1 ? <strong key={j} className="text-[var(--ink)]">{part}</strong> : part
+                    )}
+                  </p>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Wikipedia Description */}
-        {image?.description && (
+        {image?.description && !term.detailed && (
           <div className="mb-8 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6">
             <h2 className="mb-3 text-lg font-semibold text-[var(--ink)]">维基百科</h2>
             <p className="text-sm leading-relaxed text-[var(--muted)]">
