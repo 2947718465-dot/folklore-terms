@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import { useTerms } from '@/hooks/useTerms';
 import { useTermSearch } from '@/hooks/useTermSearch';
 import { useTermFilter } from '@/hooks/useTermFilter';
@@ -165,12 +165,12 @@ function Home() {
 
 function App() {
   return (
-    <BrowserRouter basename="/folklore-terms">
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/term/:id" element={<TermDetail />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
