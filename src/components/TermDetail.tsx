@@ -30,6 +30,7 @@ export function TermDetail() {
             cn: raw[0],
             en: raw[1] || '',
             definition: raw[2] || '',
+            detailed: raw[6] || undefined,
             category: raw[3],
             subcategory: raw[4],
             subcategory3: raw[5],
