@@ -19,9 +19,13 @@ export function TermDetail() {
   useEffect(() => {
     async function loadTerm() {
       try {
-        const response = await fetch(`${import.meta.env.BASE_URL}terms.json`);
-        if (!response.ok) throw new Error('Failed to load terms');
-        const data = await response.json();
+        const [termsRes, detailedRes] = await Promise.all([
+          fetch(`${import.meta.env.BASE_URL}terms.json`),
+          fetch(`${import.meta.env.BASE_URL}terms-detailed.json`),
+        ]);
+        if (!termsRes.ok) throw new Error('Failed to load terms');
+        const data = await termsRes.json();
+        const detailed = await detailedRes.json();
         const index = parseInt(id || '0', 10);
         if (index >= 0 && index < data.length) {
           const raw = data[index];
@@ -30,7 +34,7 @@ export function TermDetail() {
             cn: raw[0],
             en: raw[1] || '',
             definition: raw[2] || '',
-            detailed: raw[6] || undefined,
+            detailed: detailed[String(index)] || undefined,
             category: raw[3],
             subcategory: raw[4],
             subcategory3: raw[5],
