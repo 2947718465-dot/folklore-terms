@@ -9,6 +9,7 @@ interface TermListProps {
   query: string;
   onCategoryClick: (cat: string) => void;
   onSubcategoryClick: (sub: string) => void;
+  onTermClick?: (term: Term) => void;
 }
 
 const BATCH_SIZE = 30;
@@ -19,6 +20,7 @@ export function TermList({
   query,
   onCategoryClick,
   onSubcategoryClick,
+  onTermClick,
 }: TermListProps) {
   const [displayCount, setDisplayCount] = useState(BATCH_SIZE);
   const [isLoading, setIsLoading] = useState(false);
@@ -87,6 +89,7 @@ export function TermList({
             query={query}
             onCategoryClick={onCategoryClick}
             onSubcategoryClick={onSubcategoryClick}
+            onTermClick={onTermClick}
           />
         ))}
       </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import type { Term } from '@/types/term';
 import { useTerms } from '@/hooks/useTerms';
 import { useTermSearch } from '@/hooks/useTermSearch';
 import { useTermFilter } from '@/hooks/useTermFilter';
@@ -13,11 +13,12 @@ import { Breadcrumb } from '@/components/Breadcrumb';
 import { TermList } from '@/components/TermList';
 import { Footer } from '@/components/Footer';
 import { LoadingState } from '@/components/LoadingState';
-import { TermDetail } from '@/components/TermDetail';
 
-function Home() {
+function App() {
   const { terms, isLoading, error, totalCount } = useTerms();
   const { state, updateState, resetState } = useUrlState();
+  const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
+  const [detailed, setDetailed] = useState<string | null>(null);
 
   // Theme
   const [isDark, setIsDark] = useState(() => {
@@ -44,133 +45,94 @@ function Home() {
     state.sort
   );
 
-  // Handlers
-  const handleQueryChange = useCallback((q: string) => {
-    updateState({ q });
-  }, [updateState]);
+  // Load detailed definition when term selected
+  useEffect(() => {
+    if (!selectedTerm) { setDetailed(null); return; }
+    fetch(`${import.meta.env.BASE_URL}terms-detailed.json`)
+      .then(r => r.json())
+      .then(d => setDetailed(d[String(selectedTerm.id)] || null))
+      .catch(() => {});
+  }, [selectedTerm]);
 
-  const handleViewChange = useCallback((view: 'grid' | 'list' | 'compact') => {
-    updateState({ view });
-  }, [updateState]);
+  const handleQueryChange = useCallback((q: string) => updateState({ q }), [updateState]);
+  const handleViewChange = useCallback((v: 'grid' | 'list' | 'compact') => updateState({ view: v }), [updateState]);
+  const handleSortChange = useCallback((s: 'cn' | 'category') => updateState({ sort: s }), [updateState]);
+  const handleCatSelect = useCallback((c: string | null) => updateState({ cat: c || '', sub: '', t3: '' }), [updateState]);
+  const handleSubSelect = useCallback((s: string | null) => updateState({ sub: s || '', t3: '' }), [updateState]);
+  const handleT3Select = useCallback((t: string | null) => updateState({ t3: t || '' }), [updateState]);
+  const handleReset = useCallback(() => { resetState(); setSelectedTerm(null); }, [resetState]);
 
-  const handleSortChange = useCallback((sort: 'cn' | 'category') => {
-    updateState({ sort });
-  }, [updateState]);
+  const handleTermClick = useCallback((term: Term) => {
+    setSelectedTerm(prev => prev?.id === term.id ? null : term);
+  }, []);
 
-  const handleCatSelect = useCallback((cat: string | null) => {
-    updateState({ cat: cat || '', sub: '', t3: '' });
-  }, [updateState]);
+  if (isLoading) return <LoadingState />;
 
-  const handleSubSelect = useCallback((sub: string | null) => {
-    updateState({ sub: sub || '', t3: '' });
-  }, [updateState]);
+  if (error) return (
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="text-center">
+        <p className="text-lg text-red-500">加载失败</p>
+        <p className="mt-2 text-sm text-[var(--muted)]">{error}</p>
+      </div>
+    </div>
+  );
 
-  const handleT3Select = useCallback((t3: string | null) => {
-    updateState({ t3: t3 || '' });
-  }, [updateState]);
-
-  const handleReset = useCallback(() => {
-    resetState();
-  }, [resetState]);
-
-  if (isLoading) {
+  // Detail view
+  if (selectedTerm) {
     return (
       <div className="min-h-screen">
-        <LoadingState />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <p className="text-lg text-red-500">加载失败</p>
-          <p className="mt-2 text-sm text-[var(--muted)]">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-2 text-sm text-[var(--ink)] hover:bg-[var(--hover)]"
-          >
-            重试
+        <Header totalCount={totalCount} onReset={handleReset} />
+        <main className="mx-auto max-w-4xl px-4 py-6 md:px-6">
+          <button onClick={() => setSelectedTerm(null)} className="mb-4 flex items-center gap-1.5 text-sm text-[var(--accent)] hover:underline">
+            ← 返回列表
           </button>
-        </div>
+          <article className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6">
+            <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-[var(--muted)]">
+              <span className="rounded-full px-2 py-0.5" style={{background: {民俗事象:'#B8403D',学科概念:'#4B4D9E',理论术语:'#2E6DA4',研究关键词:'#3D8B68',研究方法:'#9B7B2C',学者与学术体制:'#8B3A5E'}[selectedTerm.category] || '#999', color: '#fff'}}>
+                {selectedTerm.category}
+              </span>
+              <span>{selectedTerm.subcategory}</span>
+              <span>›</span>
+              <span>{selectedTerm.subcategory3}</span>
+            </div>
+            <h1 className="mb-1 text-2xl font-bold text-[var(--ink)]" style={{fontFamily:'var(--font-serif)'}}>{selectedTerm.cn}</h1>
+            {selectedTerm.en && <p className="mb-4 text-sm italic text-[var(--muted)]">{selectedTerm.en}</p>}
+
+            {detailed && (
+              <div className="mt-4 rounded-lg border border-[var(--border)] bg-[var(--hover)] p-4">
+                <h3 className="mb-2 text-sm font-semibold text-[var(--ink)]">详细释义</h3>
+                <div className="text-sm leading-relaxed text-[var(--muted)] whitespace-pre-line">{detailed}</div>
+              </div>
+            )}
+
+            <div className="mt-4 text-sm leading-relaxed text-[var(--muted)]">
+              <h3 className="mb-1 font-semibold text-[var(--ink)]">简要释义</h3>
+              {selectedTerm.definition}
+            </div>
+          </article>
+        </main>
+        <Footer />
       </div>
     );
   }
 
+  // List view
   return (
     <div className="min-h-screen">
       <Header totalCount={totalCount} onReset={handleReset} />
-
       <main className="pb-8">
-        <Toolbar
-          query={state.q}
-          view={state.view}
-          sort={state.sort}
-          isDark={isDark}
-          resultCount={filtered.length}
-          totalCount={totalCount}
-          onQueryChange={handleQueryChange}
-          onViewChange={handleViewChange}
-          onSortChange={handleSortChange}
-          onThemeToggle={toggleTheme}
-        />
-
-        <div className="mb-3">
-          <CategoryBar
-            categories={categories}
-            selectedCat={state.cat}
-            onSelect={handleCatSelect}
-          />
-        </div>
-
-        <div className="mb-3">
-          <SubcategoryBar
-            subcategories={state.cat ? subcategories[state.cat] || {} : {}}
-            selectedSub={state.sub}
-            onSelect={handleSubSelect}
-          />
-        </div>
-
-        <div className="mb-3">
-          <T3Bar
-            t3categories={t3categories}
-            selectedT3={state.t3}
-            onSelect={handleT3Select}
-          />
-        </div>
-
-        <Breadcrumb
-          cat={state.cat}
-          sub={state.sub}
-          t3={state.t3}
-          query={state.q}
-          onCatClick={handleCatSelect}
-          onSubClick={handleSubSelect}
-        />
-
-        <TermList
-          terms={filtered}
-          view={state.view}
-          query={state.q}
-          onCategoryClick={handleCatSelect}
-          onSubcategoryClick={handleSubSelect}
-        />
+        <Toolbar query={state.q} view={state.view} sort={state.sort} isDark={isDark}
+          resultCount={filtered.length} totalCount={totalCount}
+          onQueryChange={handleQueryChange} onViewChange={handleViewChange}
+          onSortChange={handleSortChange} onThemeToggle={toggleTheme} />
+        <div className="mb-3"><CategoryBar categories={categories} selectedCat={state.cat} onSelect={handleCatSelect} /></div>
+        <div className="mb-3"><SubcategoryBar subcategories={state.cat ? subcategories[state.cat] || {} : {}} selectedSub={state.sub} onSelect={handleSubSelect} /></div>
+        <div className="mb-3"><T3Bar t3categories={t3categories} selectedT3={state.t3} onSelect={handleT3Select} /></div>
+        <Breadcrumb cat={state.cat} sub={state.sub} t3={state.t3} query={state.q} onCatClick={handleCatSelect} onSubClick={handleSubSelect} />
+        <TermList terms={filtered} view={state.view} query={state.q} onCategoryClick={handleCatSelect} onSubcategoryClick={handleSubSelect} onTermClick={handleTermClick} />
       </main>
-
       <Footer />
     </div>
-  );
-}
-
-function App() {
-  return (
-    <HashRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/term/:id" element={<TermDetail />} />
-      </Routes>
-    </HashRouter>
   );
 }
 

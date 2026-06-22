@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Copy, Check } from 'lucide-react';
 import type { Term, ViewMode } from '@/types/term';
 import { CATEGORIES } from '@/types/term';
@@ -11,6 +10,7 @@ interface TermCardProps {
   query: string;
   onCategoryClick: (cat: string) => void;
   onSubcategoryClick: (sub: string) => void;
+  onTermClick?: (term: Term) => void;
 }
 
 export function TermCard({
@@ -19,9 +19,9 @@ export function TermCard({
   query,
   onCategoryClick,
   onSubcategoryClick,
+  onTermClick,
 }: TermCardProps) {
   const [copied, setCopied] = useState(false);
-  const navigate = useNavigate();
   const color = CATEGORIES[term.category]?.color || '#999';
 
   const handleCopy = async (e: React.MouseEvent) => {
@@ -33,7 +33,7 @@ export function TermCard({
   };
 
   const handleClick = () => {
-    navigate(`/term/${term.id}`);
+    onTermClick?.(term);
   };
 
   const cnHtml = query ? highlight(term.cn, query) : term.cn;
