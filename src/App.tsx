@@ -13,6 +13,7 @@ import { T3Bar } from '@/components/T3Bar';
 import { Breadcrumb } from '@/components/Breadcrumb';
 import { TermList } from '@/components/TermList';
 import { TermDetail } from '@/components/TermDetail';
+import { StatsChart } from '@/components/StatsChart';
 import { Footer } from '@/components/Footer';
 import { LoadingState } from '@/components/LoadingState';
 
@@ -113,6 +114,14 @@ function App() {
                 resultCount={filtered.length} totalCount={totalCount}
                 onQueryChange={handleQueryChange} onViewChange={handleViewChange}
                 onSortChange={handleSortChange} onThemeToggle={toggleTheme} />
+              
+              {/* Stats Chart - show when no search/filter */}
+              {!state.q && !state.cat && !state.sub && !state.t3 && (
+                <div className="mb-6 mx-4 md:mx-6">
+                  <StatsChart terms={terms} />
+                </div>
+              )}
+              
               <div className="mb-3"><CategoryBar categories={categories} selectedCat={state.cat} onSelect={handleCatSelect} /></div>
               <div className="mb-3"><SubcategoryBar subcategories={state.cat ? subcategories[state.cat] || {} : {}} selectedSub={state.sub} onSelect={handleSubSelect} /></div>
               <div className="mb-3"><T3Bar t3categories={t3categories} selectedT3={state.t3} onSelect={handleT3Select} /></div>
