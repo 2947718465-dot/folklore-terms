@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Term } from '@/types/term';
 import { useTerms } from '@/hooks/useTerms';
 import { useTermSearch } from '@/hooks/useTermSearch';
@@ -19,6 +19,7 @@ function App() {
   const { state, updateState, resetState } = useUrlState();
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
   const [detailed, setDetailed] = useState<string | null>(null);
+  const scrollPosRef = useRef(0);
 
   // Theme
   const [isDark, setIsDark] = useState(() => {
@@ -54,6 +55,15 @@ function App() {
       .catch(() => {});
   }, [selectedTerm]);
 
+  // Restore scroll position when returning to list
+  useEffect(() => {
+    if (!selectedTerm && scrollPosRef.current > 0) {
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPosRef.current);
+      });
+    }
+  }, [selectedTerm]);
+
   const handleQueryChange = useCallback((q: string) => updateState({ q }), [updateState]);
   const handleViewChange = useCallback((v: 'grid' | 'list' | 'compact') => updateState({ view: v }), [updateState]);
   const handleSortChange = useCallback((s: 'cn' | 'category') => updateState({ sort: s }), [updateState]);
@@ -63,6 +73,7 @@ function App() {
   const handleReset = useCallback(() => { resetState(); setSelectedTerm(null); }, [resetState]);
 
   const handleTermClick = useCallback((term: Term) => {
+    scrollPosRef.current = window.scrollY;
     setSelectedTerm(prev => prev?.id === term.id ? null : term);
   }, []);
 
