@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
+import { motion } from 'framer-motion';
 import type { Term, ViewMode } from '@/types/term';
 import { TermCard } from './TermCard';
 import { cn } from '@/lib/utils';
@@ -14,7 +15,7 @@ interface TermListProps {
 
 const BATCH_SIZE = 50;
 
-export function TermList({
+export const TermList = memo(function TermList({
   terms,
   view,
   query,
@@ -26,7 +27,6 @@ export function TermList({
   const [isLoading, setIsLoading] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // Reset display count when terms change
   useEffect(() => {
     setDisplayCount(BATCH_SIZE);
   }, [terms]);
@@ -43,7 +43,6 @@ export function TermList({
     }, 100);
   }, [isLoading, hasMore, terms.length]);
 
-  // Infinite scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -64,8 +63,8 @@ export function TermList({
   if (terms.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-[var(--muted)]">
-        <div className="text-5xl opacity-50">📭</div>
-        <p className="mt-4 text-lg">没有匹配的术语</p>
+        <div className="text-6xl mb-4 opacity-50">📭</div>
+        <p className="text-lg font-medium">没有匹配的术语</p>
         <p className="mt-1 text-sm">试试调整筛选条件或换个关键词</p>
       </div>
     );
@@ -73,26 +72,34 @@ export function TermList({
 
   return (
     <div className="mx-auto max-w-6xl px-4 md:px-6">
-      <div
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         className={cn(
-          'gap-3',
+          'gap-4',
           view === 'grid' && 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
           view === 'list' && 'flex flex-col max-w-3xl',
           view === 'compact' && 'flex flex-col'
         )}
       >
-        {displayedTerms.map((term) => (
-          <TermCard
+        {displayedTerms.map((term, index) => (
+          <motion.div
             key={term.id}
-            term={term}
-            view={view}
-            query={query}
-            onCategoryClick={onCategoryClick}
-            onSubcategoryClick={onSubcategoryClick}
-            onTermClick={onTermClick}
-          />
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: Math.min(index * 0.02, 0.3) }}
+          >
+            <TermCard
+              term={term}
+              view={view}
+              query={query}
+              onCategoryClick={onCategoryClick}
+              onSubcategoryClick={onSubcategoryClick}
+              onTermClick={onTermClick}
+            />
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* Load More */}
       <div ref={loadMoreRef} className="py-8 text-center">
@@ -100,7 +107,7 @@ export function TermList({
           <button
             onClick={loadMore}
             disabled={isLoading}
-            className="rounded-full border border-[var(--border)] bg-[var(--surface)] px-6 py-2 text-sm text-[var(--ink)] transition-all hover:border-[var(--muted)] hover:shadow-sm disabled:opacity-50"
+            className="rounded-full border border-[var(--border)] bg-[var(--surface)] px-6 py-2.5 text-sm text-[var(--ink)] transition-all hover:border-[var(--accent)] hover:shadow-md disabled:opacity-50"
           >
             {isLoading ? '加载中…' : `加载更多 (${terms.length - displayCount} 条)`}
           </button>
@@ -114,4 +121,4 @@ export function TermList({
       </div>
     </div>
   );
-}
+});

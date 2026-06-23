@@ -1,5 +1,6 @@
 import { useState, memo } from 'react';
-import { Copy, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Copy, Check, Bookmark } from 'lucide-react';
 import type { Term, ViewMode } from '@/types/term';
 import { CATEGORIES } from '@/types/term';
 import { cn, highlight } from '@/lib/utils';
@@ -18,11 +19,15 @@ export const TermCard = memo(function TermCard({
   view,
   query,
   onCategoryClick,
-  onSubcategoryClick,
   onTermClick,
 }: TermCardProps) {
   const [copied, setCopied] = useState(false);
+  const [favorited, setFavorited] = useState(() => {
+    const favs = JSON.parse(localStorage.getItem('favorites') || '[]');
+    return favs.includes(term.cn);
+  });
   const color = CATEGORIES[term.category]?.color || '#999';
+  const icon = CATEGORIES[term.category]?.icon || '📚';
 
   const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -30,6 +35,17 @@ export const TermCard = memo(function TermCard({
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
+  };
+
+  const handleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const favs = JSON.parse(localStorage.getItem('favorites') || '[]');
+    if (favorited) {
+      localStorage.setItem('favorites', JSON.stringify(favs.filter((f: string) => f !== term.cn)));
+    } else {
+      localStorage.setItem('favorites', JSON.stringify([...favs, term.cn]));
+    }
+    setFavorited(!favorited);
   };
 
   const handleClick = () => {
@@ -40,68 +56,96 @@ export const TermCard = memo(function TermCard({
   const enHtml = query ? highlight(term.en, query) : term.en;
   const defHtml = query ? highlight(term.definition, query) : term.definition;
 
+  if (view === 'compact') {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        onClick={handleClick}
+        className="flex items-center gap-3 px-4 py-2 rounded-lg cursor-pointer transition-colors hover:bg-[var(--hover)] border-l-2"
+        style={{ borderLeftColor: color }}
+      >
+        <span className="text-lg">{icon}</span>
+        <span className="text-sm font-medium text-[var(--ink)]">
+          <span dangerouslySetInnerHTML={{ __html: cnHtml }} />
+        </span>
+        {term.en && (
+          <span className="text-xs text-[var(--muted)] italic">
+            <span dangerouslySetInnerHTML={{ __html: enHtml }} />
+          </span>
+        )}
+      </motion.div>
+    );
+  }
+
   return (
-    <article
+    <motion.article
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      whileHover={{ y: -4, boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}
       onClick={handleClick}
-      className={cn(
-        'group relative cursor-pointer rounded-xl border border-[var(--border)] bg-[var(--surface)] transition-all duration-200 hover:shadow-xl hover:-translate-y-1 hover:border-[var(--accent)]/30',
-        view === 'compact' ? 'px-4 py-3' : 'px-5 py-4'
-      )}
-      style={{ borderLeftColor: color, borderLeftWidth: '3px' }}
+      className="group relative cursor-pointer rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 transition-colors"
+      style={{ borderLeftColor: color, borderLeftWidth: '4px' }}
     >
-      {/* Actions */}
-      {view !== 'compact' && (
-        <div className="absolute right-3 top-3 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+      {/* Header with icon and category */}
+      <div className="flex items-start justify-between mb-2">
+        <div className="flex items-center gap-2">
+          <span className="text-xl">{icon}</span>
+          <span className="text-[11px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: color + '15', color }}>
+            {term.category}
+          </span>
+        </div>
+        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            onClick={handleFavorite}
+            className={cn(
+              'h-7 w-7 flex items-center justify-center rounded-md transition-all',
+              favorited ? 'text-yellow-500' : 'text-[var(--muted)] hover:text-yellow-500'
+            )}
+            title="收藏"
+          >
+            <Bookmark className="h-4 w-4" fill={favorited ? 'currentColor' : 'none'} />
+          </button>
           <button
             onClick={handleCopy}
             className={cn(
-              'flex h-7 w-7 items-center justify-center rounded-md border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] transition-all hover:text-[var(--ink)]',
-              copied && 'border-green-500 bg-green-500 text-white'
+              'h-7 w-7 flex items-center justify-center rounded-md transition-all',
+              copied ? 'bg-green-500 text-white' : 'text-[var(--muted)] hover:text-[var(--ink)]'
             )}
             title="复制"
           >
             {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
           </button>
         </div>
-      )}
-
-      {/* Content */}
-      <div className={cn(view === 'compact' ? '' : 'pr-10')}>
-        <h3 className="text-base font-semibold text-[var(--ink)]">
-          <span dangerouslySetInnerHTML={{ __html: cnHtml }} />
-          {term.en && (
-            <span className="ml-2 text-xs font-normal italic text-[var(--muted)]">
-              <span dangerouslySetInnerHTML={{ __html: enHtml }} />
-            </span>
-          )}
-        </h3>
-
-        {view !== 'compact' && (
-          <div className="mt-1 flex items-center gap-1 text-[11px] text-[var(--muted)]">
-            <button
-              onClick={(e) => { e.stopPropagation(); onCategoryClick(term.category); }}
-              className="text-[var(--accent)] underline underline-offset-2 hover:opacity-70"
-            >
-              {term.category}
-            </button>
-            <span className="text-[var(--border)]">›</span>
-            <button
-              onClick={(e) => { e.stopPropagation(); onSubcategoryClick(term.subcategory); }}
-              className="text-[var(--accent)] underline underline-offset-2 hover:opacity-70"
-            >
-              {term.subcategory}
-            </button>
-            <span className="text-[var(--border)]">›</span>
-            <span>{term.subcategory3}</span>
-          </div>
-        )}
-
-        {view !== 'compact' && (
-          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[var(--muted)]">
-            <span dangerouslySetInnerHTML={{ __html: defHtml }} />
-          </p>
-        )}
       </div>
-    </article>
+
+      {/* Title */}
+      <h3 className="text-base font-semibold text-[var(--ink)] mb-1 leading-snug">
+        <span dangerouslySetInnerHTML={{ __html: cnHtml }} />
+        {term.en && (
+          <span className="ml-2 text-xs font-normal italic text-[var(--muted)]">
+            <span dangerouslySetInnerHTML={{ __html: enHtml }} />
+          </span>
+        )}
+      </h3>
+
+      {/* Category path */}
+      <div className="flex items-center gap-1 text-[11px] text-[var(--muted)] mb-2">
+        <button
+          onClick={(e) => { e.stopPropagation(); onCategoryClick(term.category); }}
+          className="hover:text-[var(--accent)] transition-colors"
+        >
+          {term.subcategory}
+        </button>
+        <span className="text-[var(--border)]">›</span>
+        <span>{term.subcategory3}</span>
+      </div>
+
+      {/* Definition */}
+      <p className="text-sm leading-relaxed text-[var(--muted)] line-clamp-2">
+        <span dangerouslySetInnerHTML={{ __html: defHtml }} />
+      </p>
+    </motion.article>
   );
 });
