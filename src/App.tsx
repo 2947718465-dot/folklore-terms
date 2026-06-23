@@ -52,10 +52,7 @@ function App() {
   // Load detailed definition when term selected
   useEffect(() => {
     if (!selectedTerm) { setDetailed(null); return; }
-    fetch(`${import.meta.env.BASE_URL}terms-detailed.json`)
-      .then(r => r.json())
-      .then(d => setDetailed(d[String(selectedTerm.id)] || null))
-      .catch(() => {});
+    setDetailed(selectedTerm.detailed || null);
   }, [selectedTerm]);
 
   const handleQueryChange = useCallback((q: string) => updateState({ q }), [updateState]);
