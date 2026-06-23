@@ -20,9 +20,10 @@ export function useTermSearch(terms: Term[], query: string): UseTermSearchResult
         { name: 'category', weight: 0.05 },
         { name: 'subcategory', weight: 0.05 },
       ],
-      threshold: 0.3,
+      threshold: 0.4,
       includeScore: true,
       minMatchCharLength: 1,
+      ignoreLocation: true,
     });
   }, [terms]);
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { Copy, Check } from 'lucide-react';
 import type { Term, ViewMode } from '@/types/term';
 import { CATEGORIES } from '@/types/term';
@@ -13,7 +13,7 @@ interface TermCardProps {
   onTermClick?: (term: Term) => void;
 }
 
-export function TermCard({
+export const TermCard = memo(function TermCard({
   term,
   view,
   query,
@@ -44,7 +44,7 @@ export function TermCard({
     <article
       onClick={handleClick}
       className={cn(
-        'group relative cursor-pointer rounded-xl border border-[var(--border)] bg-[var(--surface)] transition-all hover:shadow-lg hover:-translate-y-0.5',
+        'group relative cursor-pointer rounded-xl border border-[var(--border)] bg-[var(--surface)] transition-all duration-200 hover:shadow-xl hover:-translate-y-1 hover:border-[var(--accent)]/30',
         view === 'compact' ? 'px-4 py-3' : 'px-5 py-4'
       )}
       style={{ borderLeftColor: color, borderLeftWidth: '3px' }}
@@ -104,4 +104,4 @@ export function TermCard({
       </div>
     </article>
   );
-}
+});

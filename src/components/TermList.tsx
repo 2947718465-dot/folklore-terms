@@ -12,7 +12,7 @@ interface TermListProps {
   onTermClick?: (term: Term) => void;
 }
 
-const BATCH_SIZE = 30;
+const BATCH_SIZE = 50;
 
 export function TermList({
   terms,
