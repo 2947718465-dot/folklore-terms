@@ -1,4 +1,4 @@
-import { useState, memo } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Copy, Check, Bookmark } from 'lucide-react';
 import type { Term, ViewMode } from '@/types/term';
@@ -9,7 +9,6 @@ interface TermCardProps {
   term: Term;
   view: ViewMode;
   query: string;
-  onCategoryClick: (cat: string) => void;
   onSubcategoryClick: (sub: string) => void;
   onTermClick?: (term: Term) => void;
 }
@@ -18,7 +17,7 @@ export const TermCard = memo(function TermCard({
   term,
   view,
   query,
-  onCategoryClick,
+  onSubcategoryClick,
   onTermClick,
 }: TermCardProps) {
   const [copied, setCopied] = useState(false);
@@ -26,6 +25,17 @@ export const TermCard = memo(function TermCard({
     const favs = JSON.parse(localStorage.getItem('favorites') || '[]');
     return favs.includes(term.cn);
   });
+
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'favorites') {
+        const favs = JSON.parse(e.newValue || '[]');
+        setFavorited(favs.includes(term.cn));
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [term.cn]);
   const color = CATEGORIES[term.category]?.color || '#999';
   const icon = CATEGORIES[term.category]?.icon || '📚';
 
@@ -133,7 +143,7 @@ export const TermCard = memo(function TermCard({
       {/* Category path */}
       <div className="flex items-center gap-1 text-[11px] text-[var(--muted)] mb-2">
         <button
-          onClick={(e) => { e.stopPropagation(); onCategoryClick(term.category); }}
+          onClick={(e) => { e.stopPropagation(); onSubcategoryClick(term.subcategory); }}
           className="hover:text-[var(--accent)] transition-colors"
         >
           {term.subcategory}

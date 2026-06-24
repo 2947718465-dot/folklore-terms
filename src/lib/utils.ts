@@ -5,11 +5,21 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export function highlight(text: string, query: string): string {
-  if (!query || !text) return text;
+  if (!query || !text) return escapeHtml(text);
   const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const escapedText = escapeHtml(text);
   const regex = new RegExp(`(${escaped})`, 'gi');
-  return text.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-800 rounded px-0.5">$1</mark>');
+  return escapedText.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-800 rounded px-0.5">$1</mark>');
 }
 
 export function debounce<T extends (...args: unknown[]) => unknown>(

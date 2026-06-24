@@ -8,7 +8,6 @@ interface TermListProps {
   terms: Term[];
   view: ViewMode;
   query: string;
-  onCategoryClick: (cat: string) => void;
   onSubcategoryClick: (sub: string) => void;
   onTermClick?: (term: Term) => void;
 }
@@ -19,7 +18,6 @@ export const TermList = memo(function TermList({
   terms,
   view,
   query,
-  onCategoryClick,
   onSubcategoryClick,
   onTermClick,
 }: TermListProps) {
@@ -44,6 +42,8 @@ export const TermList = memo(function TermList({
   }, [isLoading, hasMore, terms.length]);
 
   useEffect(() => {
+    if (!loadMoreRef.current) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
@@ -53,9 +53,7 @@ export const TermList = memo(function TermList({
       { threshold: 0.1 }
     );
 
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
-    }
+    observer.observe(loadMoreRef.current);
 
     return () => observer.disconnect();
   }, [loadMore]);
@@ -93,7 +91,6 @@ export const TermList = memo(function TermList({
               term={term}
               view={view}
               query={query}
-              onCategoryClick={onCategoryClick}
               onSubcategoryClick={onSubcategoryClick}
               onTermClick={onTermClick}
             />

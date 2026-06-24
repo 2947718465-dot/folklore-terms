@@ -1,16 +1,12 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import Fuse from 'fuse.js';
 import type { Term } from '@/types/term';
 
 interface UseTermSearchResult {
   results: Term[];
-  isLoading: boolean;
-  search: (query: string) => void;
 }
 
 export function useTermSearch(terms: Term[], query: string): UseTermSearchResult {
-  const [isLoading, setIsLoading] = useState(true);
-
   const fuse = useMemo(() => {
     return new Fuse(terms, {
       keys: [
@@ -27,18 +23,10 @@ export function useTermSearch(terms: Term[], query: string): UseTermSearchResult
     });
   }, [terms]);
 
-  useEffect(() => {
-    setIsLoading(false);
-  }, [terms]);
-
   const results = useMemo(() => {
     if (!query.trim()) return terms;
     return fuse.search(query).map(result => result.item);
   }, [fuse, query, terms]);
 
-  const search = (_newQuery: string) => {
-    // Search is handled reactively through the query parameter
-  };
-
-  return { results, isLoading, search };
+  return { results };
 }

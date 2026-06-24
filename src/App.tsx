@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Term } from '@/types/term';
 import { useTerms } from '@/hooks/useTerms';
@@ -21,7 +21,6 @@ function App() {
   const { terms, isLoading, error, totalCount } = useTerms();
   const { state, updateState, resetState } = useUrlState();
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
-  const [detailed, setDetailed] = useState<string | null>(null);
   const scrollPosRef = useRef(0);
 
   // Theme
@@ -49,11 +48,7 @@ function App() {
     state.sort
   );
 
-  // Load detailed definition when term selected
-  useEffect(() => {
-    if (!selectedTerm) { setDetailed(null); return; }
-    setDetailed(selectedTerm.detailed || null);
-  }, [selectedTerm]);
+  const detailed = useMemo(() => selectedTerm?.detailed || null, [selectedTerm]);
 
   const handleQueryChange = useCallback((q: string) => updateState({ q }), [updateState]);
   const handleViewChange = useCallback((v: 'grid' | 'list' | 'compact') => updateState({ view: v }), [updateState]);
@@ -96,6 +91,7 @@ function App() {
             detailed={detailed}
             onBack={handleBack}
             allTerms={terms}
+            onTermClick={handleTermClick}
           />
         ) : (
           <motion.div
@@ -123,7 +119,7 @@ function App() {
               <div className="mb-3"><SubcategoryBar subcategories={state.cat ? subcategories[state.cat] || {} : {}} selectedSub={state.sub} onSelect={handleSubSelect} /></div>
               <div className="mb-3"><T3Bar t3categories={t3categories} selectedT3={state.t3} onSelect={handleT3Select} /></div>
               <Breadcrumb cat={state.cat} sub={state.sub} t3={state.t3} query={state.q} onCatClick={handleCatSelect} onSubClick={handleSubSelect} />
-              <TermList terms={filtered} view={state.view} query={state.q} onCategoryClick={handleCatSelect} onSubcategoryClick={handleSubSelect} onTermClick={handleTermClick} />
+              <TermList terms={filtered} view={state.view} query={state.q} onSubcategoryClick={handleSubSelect} onTermClick={handleTermClick} />
             </main>
             <Footer />
           </motion.div>

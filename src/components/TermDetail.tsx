@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Copy, Check, Bookmark } from 'lucide-react';
 import type { Term } from '@/types/term';
@@ -10,14 +10,26 @@ interface TermDetailProps {
   detailed: string | null;
   onBack: () => void;
   allTerms: Term[];
+  onTermClick?: (term: Term) => void;
 }
 
-export function TermDetail({ term, detailed, onBack, allTerms }: TermDetailProps) {
+export function TermDetail({ term, detailed, onBack, allTerms, onTermClick }: TermDetailProps) {
   const [copied, setCopied] = useState(false);
   const [favorited, setFavorited] = useState(() => {
     const favs = JSON.parse(localStorage.getItem('favorites') || '[]');
     return favs.includes(term.cn);
   });
+
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'favorites') {
+        const favs = JSON.parse(e.newValue || '[]');
+        setFavorited(favs.includes(term.cn));
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [term.cn]);
   const color = CATEGORIES[term.category]?.color || '#999';
   const icon = CATEGORIES[term.category]?.icon || '📚';
 
@@ -144,7 +156,7 @@ export function TermDetail({ term, detailed, onBack, allTerms }: TermDetailProps
               {relatedTerms.map(rt => (
                 <button
                   key={rt.cn}
-                  onClick={() => onBack()}
+                  onClick={() => onTermClick?.(rt)}
                   className="px-3 py-1.5 rounded-lg border border-[var(--border)] text-sm text-[var(--ink)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors"
                 >
                   {rt.cn}
