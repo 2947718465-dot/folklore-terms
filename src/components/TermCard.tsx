@@ -4,6 +4,7 @@ import { Copy, Check, Bookmark } from 'lucide-react';
 import type { Term, ViewMode } from '@/types/term';
 import { CATEGORIES } from '@/types/term';
 import { cn, highlight } from '@/lib/utils';
+import { SealIcon } from '@/components/SealIcon';
 
 interface TermCardProps {
   term: Term;
@@ -37,7 +38,7 @@ export const TermCard = memo(function TermCard({
     return () => window.removeEventListener('storage', handleStorage);
   }, [term.cn]);
   const color = CATEGORIES[term.category]?.color || '#999';
-  const icon = CATEGORIES[term.category]?.icon || '📚';
+  const sealChar = CATEGORIES[term.category]?.sealChar || '文';
 
   const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -75,7 +76,7 @@ export const TermCard = memo(function TermCard({
         className="flex items-center gap-3 px-4 py-2 rounded-lg cursor-pointer transition-colors hover:bg-[var(--hover)] border-l-2"
         style={{ borderLeftColor: color }}
       >
-        <span className="text-lg">{icon}</span>
+        <SealIcon char={sealChar} color={color} size={28} />
         <span className="text-sm font-medium text-[var(--ink)]">
           <span dangerouslySetInnerHTML={{ __html: cnHtml }} />
         </span>
@@ -101,7 +102,7 @@ export const TermCard = memo(function TermCard({
       {/* Header with icon and category */}
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="text-xl">{icon}</span>
+          <SealIcon char={sealChar} color={color} size={32} />
           <span className="text-[11px] font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: color + '15', color }}>
             {term.category}
           </span>

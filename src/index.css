@@ -192,33 +192,19 @@ body::before {
 
 /* === Multi-Cultural Visual System === */
 
-/* Cultural pattern divider — subtle geometric strips inspired by textile traditions */
+/* Cultural pattern divider — bold full-width color band */
 .cultural-divider {
   height: 4px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--accent-tibetan) 0px,
-    var(--accent-tibetan) 3px,
-    transparent 3px,
-    transparent 6px,
-    var(--accent-miao) 6px,
-    var(--accent-miao) 9px,
-    transparent 9px,
-    transparent 12px,
-    var(--accent-mongol) 12px,
-    var(--accent-mongol) 15px,
-    transparent 15px,
-    transparent 18px,
-    var(--accent-uyghur) 18px,
-    var(--accent-uyghur) 21px,
-    transparent 21px,
-    transparent 24px,
-    var(--accent-dai) 24px,
-    var(--accent-dai) 27px,
-    transparent 27px,
-    transparent 30px
+  background: linear-gradient(90deg,
+    #B22222 0%, #B22222 14%,
+    #C8962E 14%, #C8962E 29%,
+    #2E5090 29%, #2E5090 43%,
+    #2D8B8B 43%, #2D8B8B 57%,
+    #B87333 57%, #B87333 71%,
+    #5D9E3F 71%, #5D9E3F 86%,
+    #6B3FA0 86%, #6B3FA0 100%
   );
-  opacity: 0.35;
+  opacity: 0.6;
 }
 
 /* Cultural border accent — for cards that relate to specific traditions */

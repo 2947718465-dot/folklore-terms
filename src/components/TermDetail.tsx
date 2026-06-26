@@ -4,6 +4,7 @@ import { ArrowLeft, Copy, Check, Bookmark } from 'lucide-react';
 import type { Term } from '@/types/term';
 import { CATEGORIES } from '@/types/term';
 import { cn } from '@/lib/utils';
+import { SealIcon } from '@/components/SealIcon';
 
 interface TermDetailProps {
   term: Term;
@@ -115,7 +116,7 @@ export function TermDetail({ term, detailed, onBack, allTerms, onTermClick }: Te
       <div className="max-w-4xl mx-auto px-4 py-8 md:px-6">
         {/* Category badge */}
         <div className="flex items-center gap-2 mb-4">
-          <span className="text-2xl">{icon}</span>
+          <SealIcon char={CATEGORIES[term.category]?.sealChar || '文'} color={color} size={36} />
           <span className="text-xs font-medium px-3 py-1 rounded-full" style={{ backgroundColor: color + '15', color }}>
             {term.category}
           </span>
