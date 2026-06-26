@@ -9,6 +9,7 @@ interface UseWorkerSearchResult {
 export function useWorkerSearch(terms: Term[], query: string): UseWorkerSearchResult {
   const workerRef = useRef<Worker | null>(null);
   const [results, setResults] = useState<Term[]>(terms);
+  const isReadyRef = useRef(false);
   const [isReady, setIsReady] = useState(false);
   const termsRef = useRef(terms);
 
@@ -17,6 +18,9 @@ export function useWorkerSearch(terms: Term[], query: string): UseWorkerSearchRe
   }, [terms]);
 
   useEffect(() => {
+    isReadyRef.current = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsReady(false);
     const worker = new Worker(
       new URL('../workers/search.worker.ts', import.meta.url),
       { type: 'module' }
@@ -26,6 +30,7 @@ export function useWorkerSearch(terms: Term[], query: string): UseWorkerSearchRe
     worker.onmessage = (e) => {
       const { type, results: searchResults } = e.data;
       if (type === 'ready') {
+        isReadyRef.current = true;
         setIsReady(true);
       }
       if (type === 'results') {
@@ -45,7 +50,7 @@ export function useWorkerSearch(terms: Term[], query: string): UseWorkerSearchRe
   }, [terms]);
 
   useEffect(() => {
-    if (!workerRef.current || !isReady) return;
+    if (!workerRef.current || !isReadyRef.current) return;
     workerRef.current.postMessage({
       type: 'search',
       payload: { query, terms: termsRef.current },

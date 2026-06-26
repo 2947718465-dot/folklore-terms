@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { Term } from '@/types/term';
 
 // Cache: one per chunk file
@@ -44,10 +44,23 @@ async function loadChunk(key: string): Promise<Record<string, string>> {
 }
 
 export function useDetailedTerm(term: Term | null) {
+<<<<<<< HEAD
   const [detailed, setDetailed] = useState<string | null>(null);
+=======
+  const [detailed, setDetailed] = useState<string | null>(() => term?.detailed || null);
+  const [isLoading, setIsLoading] = useState(false);
+  const prevTermRef = useRef<string | null>(null);
+>>>>>>> 87a9495 (fix: 修复 Worker 搜索、高亮函数、lint 警告)
 
   useEffect(() => {
+    const termCn = term?.cn ?? null;
+
+    // Skip if term hasn't changed
+    if (termCn === prevTermRef.current) return;
+    prevTermRef.current = termCn;
+
     if (!term) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDetailed(null);
       return;
     }
@@ -69,7 +82,7 @@ export function useDetailedTerm(term: Term | null) {
     fetchDetail();
 
     return () => { cancelled = true; };
-  }, [term?.cn]);
+  }, [term, term?.cn]);
 
   return { detailed };
 }
