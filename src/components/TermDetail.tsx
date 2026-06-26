@@ -163,6 +163,14 @@ export function TermDetail({ term, detailed, onBack, allTerms, onTermClick }: Te
             </div>
           </div>
         )}
+
+        {/* Copyright notice */}
+        <div className="mt-8 pt-4 border-t border-[var(--border)] text-center text-[11px] text-[var(--muted)]">
+          <p>中国民俗学术语库 © 2026 史骞升编撰 ·{' '}
+            <a href="https://github.com/2947718465-dot/folklore-terms" target="_blank" rel="noopener noreferrer" className="text-[var(--accent)] hover:underline">开源共享</a>
+          </p>
+          <p className="mt-0.5 opacity-50">内容遵循 CC BY-NC 4.0 协议，转载或引用请注明出处</p>
+        </div>
       </div>
     </motion.div>
   );

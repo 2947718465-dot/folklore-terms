@@ -1,11 +1,12 @@
-import { BookOpen, ExternalLink } from 'lucide-react';
+import { BookOpen, HelpCircle, ExternalLink } from 'lucide-react';
 
 interface HeaderProps {
   totalCount: number;
   onReset: () => void;
+  onHelp: () => void;
 }
 
-export function Header({ totalCount, onReset }: HeaderProps) {
+export function Header({ totalCount, onReset, onHelp }: HeaderProps) {
   return (
     <>
       {/* Top multi-cultural color strip */}
@@ -27,6 +28,13 @@ export function Header({ totalCount, onReset }: HeaderProps) {
             <span className="text-xs text-[var(--muted)]">
               {totalCount.toLocaleString()} 条术语
             </span>
+            <button
+              onClick={onHelp}
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] transition-all hover:border-[var(--muted)] hover:text-[var(--ink)]"
+              title="帮助"
+            >
+              <HelpCircle className="h-4 w-4" />
+            </button>
             <a
               href="https://github.com/2947718465-dot/folklore-terms"
               target="_blank"

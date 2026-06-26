@@ -17,11 +17,14 @@ import { TermDetail } from '@/components/TermDetail';
 import { StatsChart } from '@/components/StatsChart';
 import { Footer } from '@/components/Footer';
 import { LoadingState } from '@/components/LoadingState';
+import { HelpModal, useWelcomeModal } from '@/components/HelpModal';
 
 function App() {
   const { terms, isLoading, error, totalCount } = useTerms();
   const { state, updateState, resetState } = useUrlState();
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
+  const [showWelcome, closeWelcome] = useWelcomeModal();
   const scrollPosRef = useRef(0);
 
   // Protection: disable right-click, dev tools shortcuts, and iframe embedding
@@ -132,7 +135,7 @@ function App() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <Header totalCount={totalCount} onReset={handleReset} />
+            <Header totalCount={totalCount} onReset={handleReset} onHelp={() => setShowHelp(true)} />
             <main className="pb-8">
               <Toolbar query={state.q} view={state.view} sort={state.sort} isDark={isDark}
                 resultCount={filtered.length} totalCount={totalCount}
@@ -156,6 +159,12 @@ function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Welcome modal — auto-show on first visit */}
+      <HelpModal show={showWelcome} onClose={closeWelcome} />
+
+      {/* Help modal — manually triggered from header */}
+      <HelpModal show={showHelp} onClose={() => setShowHelp(false)} />
     </div>
   );
 }
