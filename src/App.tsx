@@ -98,11 +98,16 @@ function App() {
 
   const handleBack = useCallback(() => {
     setSelectedTerm(null);
-    // 等待 Framer Motion 动画完成后恢复位置
-    setTimeout(() => {
-      window.scrollTo(0, scrollPosRef.current);
-    }, 100);
   }, []);
+
+  // Restore scroll position when returning from detail view
+  useEffect(() => {
+    if (!selectedTerm && scrollPosRef.current > 0) {
+      requestAnimationFrame(() => {
+        window.scrollTo(0, scrollPosRef.current);
+      });
+    }
+  }, [selectedTerm]);
 
   if (isLoading) return <LoadingState />;
 
