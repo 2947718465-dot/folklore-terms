@@ -24,8 +24,13 @@ function App() {
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
   const scrollPosRef = useRef(0);
 
-  // Protection: disable right-click and dev tools shortcuts
+  // Protection: disable right-click, dev tools shortcuts, and iframe embedding
   useEffect(() => {
+    // Prevent iframe embedding (clickjacking protection)
+    if (window.self !== window.top) {
+      window.top!.location.href = window.self.location.href;
+    }
+
     const handleContextMenu = (e: MouseEvent) => e.preventDefault();
     const handleKeyDown = (e: KeyboardEvent) => {
       if (
@@ -36,11 +41,15 @@ function App() {
         e.preventDefault();
       }
     };
+    const handleDragStart = (e: DragEvent) => e.preventDefault();
+
     document.addEventListener('contextmenu', handleContextMenu);
     document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('dragstart', handleDragStart);
     return () => {
       document.removeEventListener('contextmenu', handleContextMenu);
       document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('dragstart', handleDragStart);
     };
   }, []);
 
