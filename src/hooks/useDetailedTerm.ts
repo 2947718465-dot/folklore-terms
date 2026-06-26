@@ -21,7 +21,7 @@ function getChunkKey(name: string): string {
 
 async function loadChunk(key: string): Promise<Record<string, string>> {
   if (chunkCache[key]) return chunkCache[key];
-  if (pendingFetches[key]) return pendingFetches[key];
+  if (key in pendingFetches) return pendingFetches[key];
 
   pendingFetches[key] = (async () => {
     try {
@@ -45,7 +45,6 @@ async function loadChunk(key: string): Promise<Record<string, string>> {
 
 export function useDetailedTerm(term: Term | null) {
   const [detailed, setDetailed] = useState<string | null>(() => term?.detailed || null);
-  const [isLoading, setIsLoading] = useState(false);
   const prevTermRef = useRef<string | null>(null);
 
   useEffect(() => {

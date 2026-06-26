@@ -22,7 +22,7 @@ export function CategoryBar({ categories, selectedCat, onSelect }: CategoryBarPr
         >
           全部
         </button>
-        {Object.entries(CATEGORIES).map(([name, { icon, color }]) => {
+        {Object.entries(CATEGORIES).map(([name, { color }]) => {
           const count = categories[name] || 0;
           const isActive = selectedCat === name;
           return (
@@ -37,7 +37,7 @@ export function CategoryBar({ categories, selectedCat, onSelect }: CategoryBarPr
               )}
               style={isActive ? { backgroundColor: color } : undefined}
             >
-              {icon} {name}
+              {name}
               <span className="ml-1 text-xs opacity-70">{count.toLocaleString()}</span>
             </button>
           );

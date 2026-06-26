@@ -26,7 +26,6 @@ export function StatsChart({ terms }: StatsChartProps) {
         count,
         percent: Math.round((count / total) * 100),
         color: CATEGORIES[name]?.color || '#999',
-        icon: CATEGORIES[name]?.icon || '📚',
       }))
       .sort((a, b) => b.count - a.count);
 
@@ -75,7 +74,7 @@ export function StatsChart({ terms }: StatsChartProps) {
           <div className="flex-1 space-y-2">
             {stats.catData.map((cat) => (
               <div key={cat.name} className="flex items-center gap-3">
-                <span className="text-lg">{cat.icon}</span>
+                <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: cat.color }} />
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-sm text-[var(--ink)]">{cat.name}</span>
