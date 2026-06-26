@@ -30,6 +30,16 @@
   --hover: #F0EDE8;
   --accent: #8B5E3C;
   --accent-light: #A67C52;
+
+  /* Multi-cultural accent palette — drawn from traditions across China */
+  --accent-tibetan: #B22222;
+  --accent-miao: #2E5090;
+  --accent-mongol: #C8962E;
+  --accent-uyghur: #2D8B8B;
+  --accent-yi: #B87333;
+  --accent-dai: #5D9E3F;
+  --accent-zhuang: #6B3FA0;
+
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
   --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
   --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
@@ -48,6 +58,14 @@
   --hover: #252525;
   --accent: #C49A6C;
   --accent-light: #D4B48C;
+
+  --accent-tibetan: #E06060;
+  --accent-miao: #5A80C0;
+  --accent-mongol: #E0B840;
+  --accent-uyghur: #4DADAD;
+  --accent-yi: #D09050;
+  --accent-dai: #7DBF5F;
+  --accent-zhuang: #9B6FCF;
 }
 
 * {
@@ -70,7 +88,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Subtle gradient background */
+/* Subtle multi-cultural gradient background */
 body::before {
   content: '';
   position: fixed;
@@ -79,14 +97,18 @@ body::before {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  background: radial-gradient(ellipse at 20% 50%, rgba(139,94,60,0.03) 0%, transparent 50%),
-              radial-gradient(ellipse at 80% 20%, rgba(139,94,60,0.02) 0%, transparent 50%);
+  background: radial-gradient(ellipse at 20% 50%, rgba(139,94,60,0.04) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 20%, rgba(46,80,144,0.03) 0%, transparent 50%),
+              radial-gradient(ellipse at 90% 80%, rgba(178,34,34,0.025) 0%, transparent 50%),
+              radial-gradient(ellipse at 10% 80%, rgba(45,139,139,0.025) 0%, transparent 50%);
   z-index: -1;
 }
 
 .dark body::before {
-  background: radial-gradient(ellipse at 20% 50%, rgba(196,154,108,0.05) 0%, transparent 50%),
-              radial-gradient(ellipse at 80% 20%, rgba(196,154,108,0.03) 0%, transparent 50%);
+  background: radial-gradient(ellipse at 20% 50%, rgba(196,154,108,0.06) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 20%, rgba(90,128,192,0.04) 0%, transparent 50%),
+              radial-gradient(ellipse at 90% 80%, rgba(224,96,96,0.03) 0%, transparent 50%),
+              radial-gradient(ellipse at 10% 80%, rgba(77,173,173,0.03) 0%, transparent 50%);
 }
 
 /* Custom scrollbar */
@@ -166,4 +188,71 @@ body::before {
 
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* === Multi-Cultural Visual System === */
+
+/* Cultural pattern divider — subtle geometric strips inspired by textile traditions */
+.cultural-divider {
+  height: 4px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--accent-tibetan) 0px,
+    var(--accent-tibetan) 3px,
+    transparent 3px,
+    transparent 6px,
+    var(--accent-miao) 6px,
+    var(--accent-miao) 9px,
+    transparent 9px,
+    transparent 12px,
+    var(--accent-mongol) 12px,
+    var(--accent-mongol) 15px,
+    transparent 15px,
+    transparent 18px,
+    var(--accent-uyghur) 18px,
+    var(--accent-uyghur) 21px,
+    transparent 21px,
+    transparent 24px,
+    var(--accent-dai) 24px,
+    var(--accent-dai) 27px,
+    transparent 27px,
+    transparent 30px
+  );
+  opacity: 0.35;
+}
+
+/* Cultural border accent — for cards that relate to specific traditions */
+.border-accent-tibetan { border-left-color: var(--accent-tibetan) !important; }
+.border-accent-miao    { border-left-color: var(--accent-miao) !important; }
+.border-accent-mongol  { border-left-color: var(--accent-mongol) !important; }
+.border-accent-uyghur  { border-left-color: var(--accent-uyghur) !important; }
+.border-accent-yi      { border-left-color: var(--accent-yi) !important; }
+.border-accent-dai     { border-left-color: var(--accent-dai) !important; }
+.border-accent-zhuang  { border-left-color: var(--accent-zhuang) !important; }
+
+/* Badge variants for cultural context tags */
+.badge-culture {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.badge-culture-tibetan { background: color-mix(in srgb, var(--accent-tibetan) 15%, transparent); color: var(--accent-tibetan); }
+.badge-culture-miao    { background: color-mix(in srgb, var(--accent-miao) 15%, transparent); color: var(--accent-miao); }
+.badge-culture-mongol  { background: color-mix(in srgb, var(--accent-mongol) 15%, transparent); color: var(--accent-mongol); }
+.badge-culture-uyghur  { background: color-mix(in srgb, var(--accent-uyghur) 15%, transparent); color: var(--accent-uyghur); }
+
+/* Footer inclusion statement styling */
+.footer-inclusion {
+  font-style: italic;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* Print styles — respect cultural decoration */
+@media print {
+  .cultural-divider {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }

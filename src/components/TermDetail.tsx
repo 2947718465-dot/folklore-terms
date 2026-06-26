@@ -133,7 +133,7 @@ export function TermDetail({ term, detailed, onBack, allTerms, onTermClick }: Te
         )}
 
         {/* Brief definition */}
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 mb-6">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 mb-6" style={{ borderLeftColor: color, borderLeftWidth: '4px' }}>
           <h2 className="text-sm font-semibold text-[var(--muted)] uppercase tracking-wide mb-3">释义</h2>
           <p className="text-base leading-relaxed text-[var(--ink)]">{term.definition}</p>
         </div>
