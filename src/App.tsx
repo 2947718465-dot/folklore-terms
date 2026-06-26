@@ -95,9 +95,10 @@ function App() {
 
   const handleBack = useCallback(() => {
     setSelectedTerm(null);
-    requestAnimationFrame(() => {
+    // 等待 Framer Motion 动画完成后恢复位置
+    setTimeout(() => {
       window.scrollTo(0, scrollPosRef.current);
-    });
+    }, 100);
   }, []);
 
   if (isLoading) return <LoadingState />;
