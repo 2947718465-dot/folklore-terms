@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import type { Term } from '@/types/term';
 import { useTerms } from '@/hooks/useTerms';
 import { useWorkerSearch } from '@/hooks/useWorkerSearch';
@@ -100,6 +99,17 @@ function App() {
     setSelectedTerm(null);
   }, []);
 
+  // Restore scroll position when returning from detail view
+  useEffect(() => {
+    if (!selectedTerm && scrollPosRef.current > 0) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.scrollTo(0, scrollPosRef.current);
+        });
+      });
+    }
+  }, [selectedTerm]);
+
   if (isLoading) return <LoadingState />;
 
   if (error) return (
@@ -113,30 +123,17 @@ function App() {
 
   return (
     <div className="min-h-screen">
-      <AnimatePresence mode="wait">
-        {selectedTerm ? (
-          <TermDetail
-            key="detail"
-            term={selectedTerm}
-            detailed={detailed}
-            onBack={handleBack}
-            allTerms={terms}
-            onTermClick={handleTermClick}
-          />
-        ) : (
-          <motion.div
-            key="list"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.1 }}
-            onAnimationComplete={() => {
-              if (scrollPosRef.current > 0) {
-                window.scrollTo(0, scrollPosRef.current);
-              }
-            }}
-          >
-            <Header totalCount={totalCount} onReset={handleReset} onHelp={() => setShowHelp(true)} />
+      {selectedTerm ? (
+        <TermDetail
+          term={selectedTerm}
+          detailed={detailed}
+          onBack={handleBack}
+          allTerms={terms}
+          onTermClick={handleTermClick}
+        />
+      ) : (
+        <div>
+          <Header totalCount={totalCount} onReset={handleReset} onHelp={() => setShowHelp(true)} />
             <main className="pb-8">
               <Toolbar query={state.q} view={state.view} sort={state.sort} isDark={isDark}
                 resultCount={filtered.length} totalCount={totalCount}
@@ -157,9 +154,9 @@ function App() {
               <TermList terms={filtered} view={state.view} query={state.q} onSubcategoryClick={handleSubSelect} onTermClick={handleTermClick} />
             </main>
             <Footer />
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+
 
       {/* Welcome modal — auto-show on first visit */}
       <HelpModal show={showWelcome} onClose={closeWelcome} />

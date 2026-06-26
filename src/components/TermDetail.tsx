@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { ArrowLeft, Copy, Check, Bookmark } from 'lucide-react';
 import type { Term } from '@/types/term';
 import { CATEGORIES } from '@/types/term';
@@ -70,11 +69,7 @@ export function TermDetail({ term, detailed, onBack, allTerms, onTermClick }: Te
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.1 }}
+    <div
       className="min-h-screen"
     >
       {/* Header */}
@@ -172,6 +167,6 @@ export function TermDetail({ term, detailed, onBack, allTerms, onTermClick }: Te
           <p className="mt-0.5 opacity-50">内容遵循 CC BY-NC 4.0 协议，转载或引用请注明出处</p>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
