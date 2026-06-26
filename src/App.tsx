@@ -100,15 +100,6 @@ function App() {
     setSelectedTerm(null);
   }, []);
 
-  // Restore scroll position when returning from detail view
-  useEffect(() => {
-    if (!selectedTerm && scrollPosRef.current > 0) {
-      requestAnimationFrame(() => {
-        window.scrollTo(0, scrollPosRef.current);
-      });
-    }
-  }, [selectedTerm]);
-
   if (isLoading) return <LoadingState />;
 
   if (error) return (
@@ -139,6 +130,11 @@ function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
+            onAnimationComplete={() => {
+              if (scrollPosRef.current > 0) {
+                window.scrollTo(0, scrollPosRef.current);
+              }
+            }}
           >
             <Header totalCount={totalCount} onReset={handleReset} onHelp={() => setShowHelp(true)} />
             <main className="pb-8">
