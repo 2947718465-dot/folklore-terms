@@ -48,6 +48,7 @@ export function useDetailedTerm(term: Term | null) {
 
   useEffect(() => {
     if (!term) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDetailed(null);
       return;
     }
