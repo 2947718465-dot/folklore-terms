@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Term } from '@/types/term';
 import { useTerms } from '@/hooks/useTerms';
-import { useTermSearch } from '@/hooks/useTermSearch';
+import { useWorkerSearch } from '@/hooks/useWorkerSearch';
 import { useTermFilter } from '@/hooks/useTermFilter';
 import { useUrlState } from '@/hooks/useUrlState';
+import { useDetailedTerm } from '@/hooks/useDetailedTerm';
 import { Header } from '@/components/Header';
 import { Toolbar } from '@/components/Toolbar';
 import { CategoryBar } from '@/components/CategoryBar';
@@ -23,6 +24,26 @@ function App() {
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(null);
   const scrollPosRef = useRef(0);
 
+  // Protection: disable right-click and dev tools shortcuts
+  useEffect(() => {
+    const handleContextMenu = (e: MouseEvent) => e.preventDefault();
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) ||
+        (e.ctrlKey && e.key === 'u')
+      ) {
+        e.preventDefault();
+      }
+    };
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   // Theme
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('theme');
@@ -36,8 +57,8 @@ function App() {
 
   const toggleTheme = useCallback(() => setIsDark(prev => !prev), []);
 
-  // Search
-  const { results: searchResults } = useTermSearch(terms, state.q);
+  // Search (using Web Worker for non-blocking search)
+  const { results: searchResults } = useWorkerSearch(terms, state.q);
 
   // Filter
   const { filtered, categories, subcategories, t3categories } = useTermFilter(
@@ -48,7 +69,7 @@ function App() {
     state.sort
   );
 
-  const detailed = useMemo(() => selectedTerm?.detailed || null, [selectedTerm]);
+  const { detailed } = useDetailedTerm(selectedTerm);
 
   const handleQueryChange = useCallback((q: string) => updateState({ q }), [updateState]);
   const handleViewChange = useCallback((v: 'grid' | 'list' | 'compact') => updateState({ view: v }), [updateState]);
