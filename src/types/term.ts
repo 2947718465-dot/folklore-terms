@@ -27,19 +27,17 @@ export interface UrlState {
 
 export interface CategoryInfo {
   name: string;
-  icon: string;
-  sealChar: string;
   color: string;
   count: number;
 }
 
-export const CATEGORIES: Record<string, { icon: string; sealChar: string; color: string }> = {
-  '民俗事象': { icon: '🏛', sealChar: '俗', color: '#B8403D' },
-  '学科概念': { icon: '📐', sealChar: '学', color: '#4B4D9E' },
-  '理论术语': { icon: '📖', sealChar: '理', color: '#2E6DA4' },
-  '研究关键词': { icon: '🔑', sealChar: '关', color: '#3D8B68' },
-  '研究方法': { icon: '🔬', sealChar: '法', color: '#9B7B2C' },
-  '学者与学术体制': { icon: '🎓', sealChar: '制', color: '#8B3A5E' },
+export const CATEGORIES: Record<string, { color: string }> = {
+  '民俗事象': { color: '#B8403D' },
+  '学科概念': { color: '#4B4D9E' },
+  '理论术语': { color: '#2E6DA4' },
+  '研究关键词': { color: '#3D8B68' },
+  '研究方法': { color: '#9B7B2C' },
+  '学者与学术体制': { color: '#8B3A5E' },
 };
 
 export function rawToTerm(raw: [string, string, string, string, string, string, string?], index: number): Term {

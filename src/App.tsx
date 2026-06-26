@@ -133,25 +133,6 @@ function App() {
           >
             <Header totalCount={totalCount} onReset={handleReset} />
             <main className="pb-8">
-              {/* Cultural diversity bar - visible on home page */}
-              {!state.q && !state.cat && !state.sub && !state.t3 && (
-                <div className="mx-4 md:mx-6 mb-4 mt-3">
-                  <div className="grid grid-cols-3 gap-2 max-w-md">
-                    <div className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-center">
-                      <div className="text-lg font-semibold" style={{ color: '#B22222' }}>22+</div>
-                      <div className="text-[11px] text-[var(--muted)]">民族</div>
-                    </div>
-                    <div className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-center">
-                      <div className="text-lg font-semibold" style={{ color: '#2E5090' }}>15+</div>
-                      <div className="text-[11px] text-[var(--muted)]">地区</div>
-                    </div>
-                    <div className="rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-center">
-                      <div className="text-lg font-semibold" style={{ color: '#C8962E' }}>{totalCount.toLocaleString()}</div>
-                      <div className="text-[11px] text-[var(--muted)]">术语</div>
-                    </div>
-                  </div>
-                </div>
-              )}
               <Toolbar query={state.q} view={state.view} sort={state.sort} isDark={isDark}
                 resultCount={filtered.length} totalCount={totalCount}
                 onQueryChange={handleQueryChange} onViewChange={handleViewChange}

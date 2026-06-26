@@ -1,8 +1,7 @@
 export function Footer() {
   return (
     <footer className="border-t border-[var(--border)] py-8 text-center text-xs text-[var(--muted)]">
-      <div className="cultural-divider mb-6 mx-auto" style={{ maxWidth: '360px' }} />
-      <p className="footer-inclusion">
+      <p className="italic max-w-md mx-auto leading-relaxed">
         本术语库涵盖中国各民族及世界范围内的民俗学知识。我们尊重每一种文化传统的表达方式，
         致力于以学术严谨的态度呈现多元文化的丰富性。术语的中文译名、民族语言标注和分类体系
         力求准确反映各文化共同体的自我理解。
