@@ -32,7 +32,6 @@ export function TermDetail({ term, detailed, onBack, allTerms, onTermClick }: Te
     return () => window.removeEventListener('storage', handleStorage);
   }, [term.cn]);
   const color = CATEGORIES[term.category]?.color || '#999';
-  const icon = CATEGORIES[term.category]?.icon || '📚';
 
   const handleCopy = async () => {
     const text = `${term.cn}${term.en ? ` (${term.en})` : ''}\n${term.definition}\n\n——${term.category} › ${term.subcategory} › ${term.subcategory3}`;
