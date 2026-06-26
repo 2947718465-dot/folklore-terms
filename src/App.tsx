@@ -4,7 +4,7 @@ import { useTerms } from '@/hooks/useTerms';
 import { useWorkerSearch } from '@/hooks/useWorkerSearch';
 import { useTermFilter } from '@/hooks/useTermFilter';
 import { useUrlState } from '@/hooks/useUrlState';
-import { useDetailedTerm } from '@/hooks/useDetailedTerm';
+import { useDetailedTerm, preloadChunks, getChunkKey } from '@/hooks/useDetailedTerm';
 import { Header } from '@/components/Header';
 import { Toolbar } from '@/components/Toolbar';
 import { CategoryBar } from '@/components/CategoryBar';
@@ -79,6 +79,21 @@ function App() {
     state.t3,
     state.sort
   );
+
+  // Preload detail chunks for visible terms so clicks are instant
+  useEffect(() => {
+    if (filtered.length === 0) return;
+    const chunkKeys = new Set<string>();
+    for (const term of filtered) {
+      chunkKeys.add(getChunkKey(term.cn));
+    }
+    // Preload in batches to avoid overwhelming the network
+    const delay = 0; // start immediately
+    const timeoutId = setTimeout(() => {
+      preloadChunks([...chunkKeys]);
+    }, delay);
+    return () => clearTimeout(timeoutId);
+  }, [filtered]);
 
   const { detailed } = useDetailedTerm(selectedTerm);
 
